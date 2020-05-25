@@ -3,6 +3,7 @@ const path = require("path");
 const { promisify } = require('util');
 const readFileAsync = promisify(fs.readFile);
 const CronJob = require('cron').CronJob;
+const ncp = promisify(require('ncp').ncp);
 const config = require('./config.json');
 const globalFunctions = require('./global-functions');
 const tempFolder = path.normalize(__dirname + "/temp");
@@ -28,11 +29,16 @@ async function getDomainsFolder() {
 }
 
 async function updateCert(dest) {
-    console.time(`Certification updated`);
-    const domainFolder = domains.filter(domain => domain.domain === dest.domain)[0].folder;
-    console.log(`Copy certificates from ${dest.domain} (${domainFolder}) to -> ${dest.destination}`);
-    await globalFunctions.execShellCommand(`scp -P ${settings.port} -i ${settings.privateKey} ${settings.username}@${settings.host}:/usr/syno/etc/certificate/_archive/${domainFolder}/* ${dest.destination}`);
-    return console.timeEnd(`Certification updated`);
+    console.time(`Updated`);
+    const domainChecker = domains.filter(domain => domain.domain === dest.domain);
+    if (domainChecker.length != 0) {
+        const domainFolder = domainChecker[0].folder;
+        console.log(`Copy certificates from ${dest.domain} (${domainFolder}) to -> ${dest.destination}`);
+        await ncp(`${tempFolderArchive}\\${domainFolder}`, dest.destination);
+        return console.timeEnd(`Updated`);
+    } else {
+        return console.log(`Can't find certificate for domain -> '${dest.domain}'`);
+    }
 }
 
 function updateCertJob() {
@@ -45,9 +51,9 @@ function updateCertJob() {
             console.log("\nClean temp folder");
             await globalFunctions.cleanFolder(tempFolder);
         }
-        console.time("\nGet certifications from synology");
+        console.time("\nGet certificates from synology");
         await globalFunctions.execShellCommand(`scp -P ${settings.port} -i ${settings.privateKey} -r ${settings.username}@${settings.host}:/usr/syno/etc/certificate/_archive/ ${tempFolder}`);
-        console.timeEnd("\nGet certifications from synology");
+        console.timeEnd("\nGet certificates from synology");
         console.group("\nSynology domains found :");
         await getDomainsFolder();
         console.groupEnd("Synology domains found :");
