@@ -1,0 +1,16 @@
+{
+    "synologySettings": {
+        "host": "1.2.3.4",
+        "port": 22,
+        "username": "root",
+        "certDestinations": [
+            {
+                "domain": "synology",
+                "destination": "./test1"
+            }
+        ]
+    },
+    "sshSettings": {
+        "privateKey": "C:/Path/To/Your/.ssh/id_rsa"
+    }
+}

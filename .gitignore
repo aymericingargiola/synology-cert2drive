@@ -1,0 +1,3 @@
+node_modules
+test[0-9]/
+temp/
