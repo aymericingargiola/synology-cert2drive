@@ -27,7 +27,7 @@ module.exports = {
             for (const file of files) {
                 fs.lstat(folder + "\/" + file, (err, stats) => {
                     if (err) {
-                        return err; //Handle error
+                        return err;
                     }
                     if (stats.isDirectory()) {
                         rmdir(folder + "\/" + file, function (error) { return error });
@@ -49,9 +49,6 @@ module.exports = {
                 correctPath = thisPath.destination.replace('.', projectPath.toString());
             } else {
                 correctPath = thisPath.destination;
-            }
-            if (!fs.existsSync(correctPath)) {
-                fs.mkdirSync(correctPath);
             }
             const destination = {
                 domain: thisPath.domain,
