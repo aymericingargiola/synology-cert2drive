@@ -46,16 +46,16 @@ async function updateCert(dest) {
 }
 
 function updateCertJob() {
-    var thisUpdateCertJob = new CronJob('*/10 * * * * *', async function () {
+    var thisUpdateCertJob = new CronJob('*/30 * * * * *', async function () {
         console.log(`\n### Start ${moment().format('MM/D/YY h:mm:ss a')}`);
         if (!fs.existsSync(tempFolder)) {
             fs.mkdirSync(tempFolder);
         } else if (fs.readdirSync(tempFolder).length != 0) {
             await globalFunctions.cleanFolder(tempFolder);
         }
-        console.time("\nGet certificates from synology");
+        console.time("\nGet certificates from Synology");
         await globalFunctions.execShellCommand(`scp -P ${settings.port} -i ${settings.privateKey} -r ${settings.username}@${settings.host}:/usr/syno/etc/certificate/_archive/ ${tempFolder}`);
-        console.timeEnd("\nGet certificates from synology");
+        console.timeEnd("\nGet certificates from Synology");
         console.group("\nDomains found on Synology :");
         await getDomainsFolder();
         console.groupEnd("Domains found on Synology :");
